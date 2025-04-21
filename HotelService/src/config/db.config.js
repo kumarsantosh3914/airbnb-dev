@@ -1,11 +1,13 @@
-import { dbConfig } from './index';
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 const config = {
   development: {
-    username: dbConfig.DB_HOST,
-    password: dbConfig.DB_PASSWORD,
-    database: dbConfig.DB_NAME,
-    host: dbConfig.DB_HOST,
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    host: process.env.DB_HOST,
     dialect: 'mysql',
   }
 }
