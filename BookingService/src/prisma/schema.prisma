@@ -14,24 +14,25 @@ datasource db {
 }
 
 model Booking {
-  id               Int             @id @default(autoincrement())
-  userId           Int
-  hotelId          Int
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-  bookingAmount    Int
-  status           BookingStatus   @default(PENDING)
-  totalGuests      Int
-  idempotencyKeyId Int?            @unique
-  idempotencyKey   idempotencyKey? @relation(fields: [idempotencyKeyId], references: [id])
+  id             Int             @id @default(autoincrement())
+  userId         Int
+  hotelId        Int
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  bookingAmount  Int
+  status         BookingStatus   @default(PENDING)
+  totalGuests    Int
+  idempotencyKey IdempotencyKey?
 }
 
-model idempotencyKey {
-  id        Int      @id @default(autoincrement())
-  key       String   @unique // uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  booking   Booking?
+model IdempotencyKey {
+  id          Int      @id @default(autoincrement())
+  key         String   @unique // uuid
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  finalizedAt Boolean  @default(false)
+  bookingId   Int      @unique
+  booking     Booking  @relation(fields: [bookingId], references: [id])
 }
 
 enum BookingStatus {
