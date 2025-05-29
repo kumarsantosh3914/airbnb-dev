@@ -26,13 +26,13 @@ model Booking {
 }
 
 model IdempotencyKey {
-  id          Int      @id @default(autoincrement())
-  key         String   @unique // uuid
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  finalizedAt Boolean  @default(false)
-  bookingId   Int      @unique
-  booking     Booking  @relation(fields: [bookingId], references: [id])
+  id        Int      @id @default(autoincrement())
+  idemKey   String   @unique // uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  finalized Boolean  @default(false)
+  bookingId Int      @unique
+  booking   Booking  @relation(fields: [bookingId], references: [id])
 }
 
 enum BookingStatus {
