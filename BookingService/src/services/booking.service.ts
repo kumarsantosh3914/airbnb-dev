@@ -6,31 +6,50 @@ import {
   finalizedIdempotencyKey,
   getIdempotencyKeyWithLock,
 } from "../repositories/booking.repository";
-import { BadRequestError, NotFoundError } from "../utils/errors/app.error";
+import {
+  BadRequestError,
+  InternalServerError,
+  NotFoundError,
+} from "../utils/errors/app.error";
 import { generateIdempotencyKey } from "../utils/generateIdempotencyKey";
 import prismaClient from "../prisma/client";
+import { serverConfig } from "../config";
+import { redlock } from "../config/redis.config";
 
 export async function createBookingService(createBookingDto: CreateBookingDto) {
-  const booking = await createBooking({
-    userId: createBookingDto.userId,
-    hotelId: createBookingDto.hotelId,
-    totalGuests: createBookingDto.totalGuests,
-    bookingAmount: createBookingDto.bookingAmount,
-  });
+  const ttl = serverConfig.LOCK_TTL;
+  const bookingResource = `hotel:${createBookingDto.hotelId}`;
 
-  const idempotencyKey = generateIdempotencyKey();
+  try {
+      await redlock.acquire([bookingResource], ttl);
+      const booking = await createBooking({
+        userId: createBookingDto.userId,
+        hotelId: createBookingDto.hotelId,
+        totalGuests: createBookingDto.totalGuests,
+        bookingAmount: createBookingDto.bookingAmount,
+      });
 
-  await createIdempotencyKey(idempotencyKey, booking.id);
+      const idempotencyKey = generateIdempotencyKey();
 
-  return {
-    bookingId: booking.id,
-    idempotencyKey: idempotencyKey,
-  };
+      await createIdempotencyKey(idempotencyKey, booking.id);
+
+      return {
+        bookingId: booking.id,
+        idempotencyKey: idempotencyKey,
+      };
+  } catch (error) {
+    throw new InternalServerError(
+      "Failed to acquire lock for booking resource"
+    );
+  }
 }
 
 export async function confirmBookingService(idempotencyKey: string) {
   return prismaClient.$transaction(async (tx) => {
-    const idempotencyKeyData = await getIdempotencyKeyWithLock(tx, idempotencyKey);
+    const idempotencyKeyData = await getIdempotencyKeyWithLock(
+      tx,
+      idempotencyKey
+    );
 
     if (!idempotencyKeyData || !idempotencyKeyData.bookingId) {
       throw new NotFoundError("Idempotency key not found");
