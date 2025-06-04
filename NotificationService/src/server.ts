@@ -7,6 +7,7 @@ import { appErrorHandler, genericErrorHandler } from './middlewares/error.middle
 import { attachCorrelationIdMiddleware } from './middlewares/correlation.middleware';
 import logger from './config/logger.config';
 import { setupMailerWorker } from './processors/email.processor';
+import { addEmailToQueue } from './producers/email.producer';
 
 const app: Express = express();
 
@@ -26,4 +27,14 @@ app.listen(serverConfig.PORT, async () => {
     logger.info(`Server is running on http://localhost:${serverConfig.PORT}`);
     setupMailerWorker();
     logger.info('Mailer worker setup completed');
+
+    addEmailToQueue({
+        to: 'santoshkumar15novmth@gmail.com',
+        subject: 'Test Email',
+        templateId: 'Welcome',
+        params: {
+            name: "Santosh Kumar",
+            appName: "Booking App"
+        }
+    })
 })
