@@ -3,16 +3,16 @@ import {
   InferAttributes,
   InferCreationAttributes,
   Model,
-} from 'sequelize';
-import sequelize from './sequelize';
-import Hotel from './hotel';
+} from "sequelize";
+import sequelize from "./sequelize";
+import Hotel from "./hotel";
 
-enum RoomType {
-  SINGLE = 'SINGLE',
-  DOUBLE = 'DOUBLE',
-  FAMILY = 'FAMILY',
-  DELUXE = 'DELUXE',
-  SUITE = 'SUITE',
+export enum RoomType {
+  SINGLE = "SINGLE",
+  DOUBLE = "DOUBLE",
+  FAMILY = "FAMILY",
+  DELUXE = "DELUXE",
+  SUITE = "SUITE",
 }
 
 class RoomCategory extends Model<
@@ -32,45 +32,45 @@ class RoomCategory extends Model<
 RoomCategory.init(
   {
     id: {
-      type: 'INTEGER',
+      type: "INTEGER",
       autoIncrement: true,
       primaryKey: true,
     },
     hotelId: {
-      type: 'INTEGER',
+      type: "INTEGER",
       allowNull: false,
       references: {
         model: Hotel,
-        key: 'id',
+        key: "id",
       },
     },
     price: {
-      type: 'INTEGER',
+      type: "INTEGER",
       allowNull: false,
     },
     roomType: {
-      type: 'ENUM',
+      type: "ENUM",
       values: [...Object.values(RoomType)],
     },
     roomCount: {
-      type: 'INTEGER',
+      type: "INTEGER",
       allowNull: false,
     },
     createdAt: {
-      type: 'DATE',
+      type: "DATE",
       defaultValue: new Date(),
     },
     updatedAt: {
-      type: 'DATE',
+      type: "DATE",
       defaultValue: new Date(),
     },
     deletedAt: {
-      type: 'DATE',
+      type: "DATE",
       defaultValue: null,
     },
   },
   {
-    tableName: 'room_categories',
+    tableName: "room_categories",
     sequelize: sequelize,
     underscored: true,
     timestamps: true,
