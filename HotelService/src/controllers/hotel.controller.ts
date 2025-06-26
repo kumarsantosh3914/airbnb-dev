@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { createHotelService, deleteHotelService, getAllHotelsService, getHotelByIdService, updateHotelService } from "../services/hotel.service";
 
-export async function createHotelHanlder(req: Request, res: Response, next: NextFunction) {
+export async function createHotelHandler(req: Request, res: Response, next: NextFunction) {
     const hotelResponse = await createHotelService(req.body);
 
     res.status(201).json({
