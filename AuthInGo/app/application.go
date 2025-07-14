@@ -17,7 +17,7 @@ type Config struct {
 
 type Application struct {
 	Config Config
-	Store  db.Storage
+	// Store  db.Storage
 }
 
 // Construction for Config
@@ -33,7 +33,7 @@ func NewConfig() Config {
 func NewApplication(cfg Config) *Application {
 	return &Application{
 		Config: cfg,
-		Store:  *db.NewStorage(),
+		// Store:  *db.NewStorage(),
 	}
 }
 
