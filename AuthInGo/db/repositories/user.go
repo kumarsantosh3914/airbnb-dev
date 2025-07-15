@@ -110,11 +110,11 @@ func (u *UserRepositoryImpl) GetAll() ([]*models.User, error) {
 func (u *UserRepositoryImpl) GetUserByEmail(email string) (*models.User, error) {
 	query := "SELECT id, username, email, password FROM users WHERE email = ?"
 
-	row := u.db.QueryRow(query)
+	row := u.db.QueryRow(query, email)
 
 	user := &models.User{}
 
-	err := row.Scan(&user.Id, &user.Email, &user.Password) //hashed password
+	err := row.Scan(&user.Id, &user.Username, &user.Email, &user.Password) //hashed password
 	if err != nil {
 		if err == sql.ErrNoRows {
 			fmt.Println("No user found with the given email")
