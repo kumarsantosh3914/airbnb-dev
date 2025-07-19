@@ -7,8 +7,8 @@ import (
 )
 
 type UserRepository interface {
-	Create(username string, email string, password string) error
-	GetByID() (*models.User, error)
+	Create(username string, email string, password string) (*models.User, error)
+	GetByID(id int64) (*models.User, error)
 	GetAll() ([]*models.User, error)
 	DeleteByID(id int64) error
 	GetUserByEmail(email string) (*models.User, error)
@@ -24,38 +24,38 @@ func NewUserRepository(_db *sql.DB) UserRepository {
 	}
 }
 
-func (u *UserRepositoryImpl) Create(username string, email string, hashedPassword string) error {
+func (u *UserRepositoryImpl) Create(username string, email string, hashedPassword string) (*models.User, error) {
 	query := "INSERT INTO users (username, email, password) VALUES (?, ?, ?)"
 
 	result, err := u.db.Exec(query, username, email, hashedPassword)
 	if err != nil {
-		fmt.Println("Error inserting user: ", err)
-		return err
+		fmt.Println("Error creating user: ", err)
+		return nil, err
 	}
 
-	rowsAffected, rowErr := result.RowsAffected()
+	lastInsertID, rowErr := result.LastInsertId()
 
 	if rowErr != nil {
-		fmt.Println("Error getting rows affected: ", rowErr)
-		return rowErr
+		fmt.Println("Error getting last insert ID: ", rowErr)
+		return nil, rowErr
 	}
 
-	if rowsAffected == 0 {
-		fmt.Println("No rows were affected, user not created")
-		return nil
+	user := &models.User{
+		Id:       lastInsertID,
+		Username: username,
+		Email:    email,
 	}
 
-	fmt.Println("User created successfully, rows affected", rowsAffected)
+	fmt.Println("User created successfully:", user)
 
-	return nil
+	return user, nil
 }
 
-func (u *UserRepositoryImpl) GetByID() (*models.User, error) {
+func (u *UserRepositoryImpl) GetByID(id int64) (*models.User, error) {
 	query := "SELECT id, username, email, created_at, updated_at FROM users WHERE id = ?"
 
-	row := u.db.QueryRow(query, 1)
+	row := u.db.QueryRow(query, id)
 
-	fmt.Println("row.....", row)
 	user := &models.User{}
 
 	err := row.Scan(&user.Id, &user.Username, &user.Email, &user.CreatedAt, &user.UpdatedAt)
@@ -129,5 +129,25 @@ func (u *UserRepositoryImpl) GetUserByEmail(email string) (*models.User, error) 
 }
 
 func (u *UserRepositoryImpl) DeleteByID(id int64) error {
+	query := "DELETE FROM users WHERE id = ?"
+	result, err := u.db.Exec(query, id)
+
+	if err != nil {
+		fmt.Println("Error deleting user:", err)
+		return err
+	}
+
+	rowsAffected, rowErr := result.RowsAffected()
+	if rowErr != nil {
+		fmt.Println("Error getting rows affected:", rowErr)
+		return rowErr
+	}
+
+	if rowsAffected == 0 {
+		fmt.Println("Now rows were affected, user not deleted")
+		return nil
+	}
+
+	fmt.Println("User deleted successfully, rows affected:", rowsAffected)
 	return nil
 }

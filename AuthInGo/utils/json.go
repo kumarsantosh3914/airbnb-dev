@@ -51,6 +51,17 @@ func WriteJsonErrorResponse(w http.ResponseWriter, status int, message string, e
 
 func ReadJsonBody(r *http.Request, result any) error {
 	decoder := json.NewDecoder(r.Body)
-	decoder.DisallowUnknownFields() // Prevent unknown fields from begin include in the JSON body
-	return decoder.Decode(result)
+	decoder.DisallowUnknownFields() // Prevent unknown fields from being included in the JSON body
+	
+	// Decode the JSON body
+	if err := decoder.Decode(result); err != nil {
+		return fmt.Errorf("failed to decode JSON: %w", err)
+	}
+	
+	// Validate the decoded struct
+	if err := Validator.Struct(result); err != nil {
+		return fmt.Errorf("validation failed: %w", err)
+	}
+	
+	return nil
 }
