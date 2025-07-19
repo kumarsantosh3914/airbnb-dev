@@ -57,10 +57,13 @@ func (u *UserServiceImpl) LoginUser(payload *dto.LoginUserRequestDTO) (string, e
 
 	user, err := u.userRepository.GetUserByEmail(email)
 	if err != nil {
+		if err.Error() == "sql: no rows in result set" {
+			fmt.Printf("No user found with the given email")
+			return "", fmt.Errorf("No user found with email: %s", email)
+		}
 		fmt.Println("Error fetching user by email")
 		return "", err
 	}
-
 	if user == nil {
 		fmt.Println("No user found with the given email")
 		return "", fmt.Errorf("No user found with email: %s", email)
@@ -69,7 +72,7 @@ func (u *UserServiceImpl) LoginUser(payload *dto.LoginUserRequestDTO) (string, e
 	isPasswordValid := utils.CheckPasswordHash(password, user.Password)
 	if !isPasswordValid {
 		fmt.Println("Password does not match")
-		return "", nil
+		return "", fmt.Errorf("Password does not match")
 	}
 
 	jwtPayload := jwt.MapClaims{

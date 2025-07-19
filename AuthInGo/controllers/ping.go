@@ -6,5 +6,5 @@ import (
 )
 
 func PingHandler(w http.ResponseWriter, r *http.Request) {
-	utils.WriteJsonSuccessResponse(w, http.StatusOK, "Server is running", map[string]string{"status": "pong"})
+	utils.WriteJsonSuccessResponse(w, http.StatusOK, "Server is running", map[string]string{"status": "pong"}) // No error expected here
 }
