@@ -1,7 +1,10 @@
 package controllers
 
-import "net/http"
+import (
+	"AuthInGo/utils"
+	"net/http"
+)
 
 func PingHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("pong"))
+	utils.WriteJsonSuccessResponse(w, http.StatusOK, "Server is running", map[string]string{"status": "pong"})
 }
