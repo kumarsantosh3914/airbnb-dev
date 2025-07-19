@@ -3,6 +3,7 @@ package services
 import (
 	env "AuthInGo/config/env"
 	db "AuthInGo/db/repositories"
+	"AuthInGo/dto"
 	"AuthInGo/utils"
 	"fmt"
 
@@ -12,7 +13,7 @@ import (
 type UserService interface {
 	CreateUser() error
 	GetByID() error
-	LoginUser() (string, error)
+	LoginUser(payload *dto.LoginUserRequestDTO) (string, error)
 }
 
 type UserServiceImpl struct {
@@ -50,9 +51,9 @@ func (u *UserServiceImpl) CreateUser() error {
 	return nil
 }
 
-func (u *UserServiceImpl) LoginUser() (string, error) {
-	email := "santosh@gmail.com"
-	password := "Santosh@123323"
+func (u *UserServiceImpl) LoginUser(payload *dto.LoginUserRequestDTO) (string, error) {
+	email := payload.Email
+	password := payload.Password
 
 	user, err := u.userRepository.GetUserByEmail(email)
 	if err != nil {
@@ -71,21 +72,14 @@ func (u *UserServiceImpl) LoginUser() (string, error) {
 		return "", nil
 	}
 
-	payload := jwt.MapClaims{
+	jwtPayload := jwt.MapClaims{
 		"email": user.Email,
 		"id":    user.Id,
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwtPayload)
 
 	tokenString, err := token.SignedString([]byte(env.GetString("JWT_SECRET", "TOKEN")))
-
-	if err != nil {
-		fmt.Println("Error signing token:", err)
-		return "", err
-	}
-
-	fmt.Println("JWT Token:", tokenString)
 
 	return tokenString, nil
 }
