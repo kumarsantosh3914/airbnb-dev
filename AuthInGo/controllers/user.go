@@ -5,8 +5,6 @@ import (
 	"AuthInGo/services"
 	"AuthInGo/utils"
 	"fmt"
-	"strconv"
-
 	"net/http"
 )
 
@@ -25,24 +23,23 @@ func (uc *UserController) GetUserById(w http.ResponseWriter, r *http.Request) {
 	// Extract userid from url parameters
 	userId := r.URL.Query().Get("id")
 	if userId == "" {
+		// fallback to context if userId is not provided in the URL
+		userId = r.Context().Value("userID").(string)
+	}
+
+	if userId == "" {
 		utils.WriteJsonErrorResponse(w, http.StatusBadRequest, "User ID is required", fmt.Errorf("Missing user ID"))
 		return
 	}
 
-	id, err := strconv.ParseInt(userId, 10, 64)
-	if err != nil {
-		utils.WriteJsonErrorResponse(w, http.StatusBadRequest, "Invalid user ID format", err)
-		return
-	}
-
-	user, err := uc.UserService.GetByID(id)
+	user, err := uc.UserService.GetByID(userId)
 	if err != nil {
 		utils.WriteJsonErrorResponse(w, http.StatusInternalServerError, "Failed to fetch user", err)
 		return
 	}
 
 	if user == nil {
-		utils.WriteJsonErrorResponse(w, http.StatusNotFound, "User not found", fmt.Errorf("No user found with ID: %d", id))
+		utils.WriteJsonErrorResponse(w, http.StatusNotFound, "User not found", fmt.Errorf("No user found with ID: %d", userId))
 		return
 	}
 
