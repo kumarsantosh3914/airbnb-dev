@@ -16,16 +16,22 @@ This project follows a microservices architecture pattern with the following ser
 ### 1. AuthInGo (Authentication Service)
 
 **Language**: Go  
-**Purpose**: Handles user authentication, registration, and login functionality
+**Purpose**: Handles user authentication, registration, login, JWT-protected profile, request validation, rate limiting, and proxies requests to hotel/booking services.
 
 #### Features Implemented:
 - ✅ User Registration
 - ✅ User Login
 - ✅ JWT Token Authentication
+- ✅ Protected Profile Endpoint (JWT)
+- ✅ Request Validation Middleware (signup/login)
+- ✅ Rate Limiting Middleware
 - ✅ Database Connection Management
 - ✅ RESTful API Endpoints
 - ✅ Environment Configuration
 - ✅ Health Check Endpoint
+- ✅ Proxy to Hotel & Booking Services
+- ✅ Consistent JSON Error/Success Responses
+- ✅ Improved Error Handling
 
 #### Technologies & Tools:
 - **Framework**: Go with Chi Router (`github.com/go-chi/chi/v5`)
@@ -38,9 +44,14 @@ This project follows a microservices architecture pattern with the following ser
 
 #### API Endpoints:
 ```
-POST /users/register - User registration
-POST /users/login    - User login
-GET  /ping          - Health check
+POST /signup     - User registration (validated)
+POST /login      - User login (validated)
+GET  /profile    - Get user profile (JWT protected)
+GET  /ping       - Health check
+
+# Proxy routes (internal)
+/hotelservice/*      - Proxies to HotelService
+/bookingservice/*    - Proxies to BookingService
 ```
 
 #### Project Structure:
@@ -49,12 +60,15 @@ AuthInGo/
 ├── app/           # Application configuration
 ├── config/        # Database and environment config
 ├── controllers/   # Request handlers
-├── db/           # Database connection
-├── models/       # Data models
-├── router/       # Route definitions
-├── services/     # Business logic
-├── utils/        # Utility functions
-└── main.go       # Application entry point
+├── db/            # Database connection
+├── dto/           # Data transfer objects
+├── errors/        # Error handling
+├── middlewares/   # Auth, validation, rate limiting
+├── models/        # Data models
+├── router/        # Route definitions
+├── services/      # Business logic
+├── utils/         # Utility functions (JSON, proxy, auth)
+└── main.go        # Application entry point
 ```
 
 ---
