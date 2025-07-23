@@ -1,6 +1,7 @@
 package router
 
 import (
+	env "AuthInGo/config/env"
 	"AuthInGo/controllers"
 	"AuthInGo/middlewares"
 	"AuthInGo/utils"
@@ -24,7 +25,8 @@ func SetupRouter(UserRouter Router) *chi.Mux {
 
 	chiRouter.Get("/ping", controllers.PingHandler)
 
-	chiRouter.HandleFunc("/fakestoreservice/*", utils.ProxyToService("https://fakestoreapi.in", "/fakestoreservice"))
+	chiRouter.HandleFunc("/hotelservice/*", utils.ProxyToService(env.GetString("HOTEL_SERVICE_URL", ""), "/hotelservice"))
+	chiRouter.HandleFunc("/bookingservice/*", utils.ProxyToService(env.GetString("BOOKING_SERVICE_URL", ""), "/bookingservice"))
 
 	UserRouter.Register(chiRouter)
 

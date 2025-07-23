@@ -27,8 +27,7 @@ func ProxyToService(targetBaseUrl string, pathPrefix string) http.HandlerFunc {
 
 		strippedPath := strings.TrimPrefix(originalPath, pathPrefix)
 
-		r.URL.Host = target.Host
-		r.URL.Path = target.Path + strippedPath
+		r.URL.Path = "/api/v1" + strippedPath
 
 		r.Host = target.Host
 
