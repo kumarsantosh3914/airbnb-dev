@@ -1,9 +1,13 @@
 package services
 
-import db "ReviewService/db/repositories"
+import (
+	db "ReviewService/db/repositories"
+	"ReviewService/dto"
+	"ReviewService/models"
+)
 
 type ReviewService interface {
-	CreateReview() error
+	CreateReview(payload *dto.ReviewDTO) (*models.Review, error)
 	GetReviewByID() error
 	UpdateReview() error
 	DeleteReview() error
@@ -19,8 +23,18 @@ func NewReviewService(_reviewRepository db.ReviewRepository) ReviewService {
 	}
 }
 
-func (r *ReviewServiceImpl) CreateReview() error {
-	return nil
+func (r *ReviewServiceImpl) CreateReview(payload *dto.ReviewDTO) (*models.Review, error) {
+	review, err := r.reviewRepository.CreateReview(
+		payload.UserId,
+		payload.HotelId,
+		payload.BookingId,
+		payload.Comment,
+		payload.Rating,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return review, nil
 }
 
 func (r *ReviewServiceImpl) GetReviewByID() error {

@@ -2,6 +2,7 @@ package router
 
 import (
 	"ReviewService/controllers"
+	middlewares "ReviewService/middlewares"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -17,5 +18,7 @@ func NewReviewRouter(_reviewController *controllers.ReviewController) Router {
 }
 
 func (rr *ReviewRouter) Register(r chi.Router) {
-	// put all the review routers here
+	r.Route("/api/v1/reviews", func(r chi.Router) {
+		r.With(middlewares.ReviewCreateRequestValidator).Post("/", rr.reviewController.CreateReview)
+	})
 }
