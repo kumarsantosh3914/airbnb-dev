@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS roles (
     description TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-)
+);
 
 -- INSERT INTO roles (name, description) VALUES
 -- ('admin', 'Administrator with full access'),
