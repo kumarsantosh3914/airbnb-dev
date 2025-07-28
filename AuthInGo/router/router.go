@@ -14,7 +14,7 @@ type Router interface {
 	Register(r chi.Router)
 }
 
-func SetupRouter(UserRouter Router) *chi.Mux {
+func SetupRouter(UserRouter Router, RoleRouter Router) *chi.Mux {
 	chiRouter := chi.NewRouter()
 
 	// chiRouter.Use(middlewares.RequestLogger) // Use the RequestLogger middleware
@@ -29,6 +29,7 @@ func SetupRouter(UserRouter Router) *chi.Mux {
 	chiRouter.HandleFunc("/bookingservice/*", utils.ProxyToService(env.GetString("BOOKING_SERVICE_URL", ""), "/bookingservice"))
 
 	UserRouter.Register(chiRouter)
+	RoleRouter.Register(chiRouter)
 
 	return chiRouter
 }
