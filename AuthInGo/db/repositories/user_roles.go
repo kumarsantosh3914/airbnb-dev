@@ -3,6 +3,8 @@ package db
 import (
 	"AuthInGo/models"
 	"database/sql"
+	"fmt"
+	"strings"
 )
 
 type UserRoleRepository interface {
@@ -13,6 +15,7 @@ type UserRoleRepository interface {
 	HasPermission(userId int64, permissionName string) (bool, error)
 	HasRole(userId int64, roleName string) (bool, error)
 	HasAllRoles(userId int64, roleNames []string) (bool, error)
+	HasAnyRole(userId int64, roleNames []string) (bool, error)
 }
 
 type UserRoleRepositoryImpl struct {
@@ -153,4 +156,41 @@ func (u *UserRoleRepositoryImpl) HasAllRoles(userId int64, roleNames []string) (
 	}
 
 	return hasAllRoles, nil
+}
+
+func (u *UserRoleRepositoryImpl) HasAnyRole(userId int64, roleNames []string) (bool, error) {
+
+	if len(roleNames) == 0 {
+		// If no roles are specified, return true
+		return true, nil
+	}
+
+	placeholders := strings.Repeat("?,", len(roleNames))
+	placeholders = placeholders[:len(placeholders)-1]
+	query := fmt.Sprintf("SELECT COUNT(*) > 0 FROM user_roles ur INNER JOIN roles r ON ur.role_id = r.id WHERE ur.user_id = ? AND r.name IN (%s)", placeholders)
+
+	// Create args slice with userId first, then all roleNames
+	args := make([]interface{}, 0, 1+len(roleNames))
+	args = append(args, userId)
+
+	for _, roleName := range roleNames {
+		args = append(args, roleName)
+	}
+
+	row := u.db.QueryRow(query, args...)
+
+	var hasAnyRole bool
+	if err := row.Scan(&hasAnyRole); err != nil {
+		if err == sql.ErrNoRows {
+			// No roles found for the user
+			return false, nil
+		}
+
+		// return any other error
+		return false, err
+	}
+
+	fmt.Println("hasAnyRole", hasAnyRole)
+
+	return hasAnyRole, nil
 }
