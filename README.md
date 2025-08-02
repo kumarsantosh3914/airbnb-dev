@@ -10,6 +10,7 @@ This project follows a microservices architecture pattern with the following ser
 - **BookingService** - Booking Management Service (Node.js/TypeScript)
 - **HotelService** - Hotel & Room Management Service (Node.js/TypeScript)
 - **NotificationService** - Email Notification Service (Node.js/TypeScript)
+- **ReviewService** - User Reviews & Ratings Service (Go)
 
 ## 🚀 Services Overview
 
@@ -32,6 +33,9 @@ This project follows a microservices architecture pattern with the following ser
 - ✅ Proxy to Hotel & Booking Services
 - ✅ Consistent JSON Error/Success Responses
 - ✅ Improved Error Handling
+- ✅ **OTP Email Verification System**
+- ✅ **Role-Based Access Control (RBAC)**
+- ✅ **Automatic Role Assignment**
 
 #### Technologies & Tools:
 - **Framework**: Go with Chi Router (`github.com/go-chi/chi/v5`)
@@ -70,6 +74,102 @@ AuthInGo/
 ├── utils/         # Utility functions (JSON, proxy, auth)
 └── main.go        # Application entry point
 ```
+
+### 🛡️ OTP Email Verification System
+
+AuthInGo now implements a robust OTP-based email verification system for enhanced security and account management.
+
+**Features:**
+- Secure 6-digit OTPs generated using crypto/rand
+- 10-minute OTP expiration, single-use, and automatic cleanup
+- Supports multiple purposes: `email_verification`, `password_reset`
+- Integrated with registration flow (users must verify email)
+- Rate limiting and input validation
+- Beautiful HTML email templates sent via NotificationService
+
+**Database Changes:**
+- New table: `otps` (stores OTPs, purpose, expiry, usage status)
+- `users` table has new column: `is_email_verified`
+
+**API Endpoints:**
+```
+POST /api/otp/send     - Send OTP to email
+POST /api/otp/verify   - Verify OTP
+POST /api/otp/resend   - Resend OTP
+```
+
+**Request/Response Example:**
+- `POST /api/otp/send`
+  ```json
+  {
+    "email": "user@example.com",
+    "purpose": "email_verification"
+  }
+  ```
+  Response:
+  ```json
+  {
+    "success": true,
+    "message": "OTP sent successfully",
+    "email": "user@example.com",
+    "purpose": "email_verification"
+  }
+  ```
+
+- `POST /api/otp/verify`
+  ```json
+  {
+    "email": "user@example.com",
+    "code": "123456",
+    "purpose": "email_verification"
+  }
+  ```
+  Response:
+  ```json
+  {
+    "success": true,
+    "message": "OTP verified successfully",
+    "email": "user@example.com",
+    "purpose": "email_verification"
+  }
+  ```
+
+**Configuration:**
+- Requires NotificationService URL and SMTP settings in `.env`
+
+---
+
+### 🏷️ Role-Based Access Control (RBAC)
+
+AuthInGo now supports full RBAC for granular permissions and secure access control.
+
+**Features:**
+- Roles (e.g., `user`, `admin`) and permissions (CRUD operations, resource-level)
+- Assign/remove roles to/from users
+- Assign/remove permissions to/from roles
+- Middleware for role/permission enforcement on endpoints
+- Automatic assignment of default `user` role on signup (with fallback logic)
+- Role and permission management APIs
+
+**Database Changes:**
+- Tables: `roles`, `permissions`, `role_permissions`, `user_roles`
+
+**API Endpoints (examples):**
+```
+POST   /api/roles/           - Create new role
+GET    /api/roles/           - List all roles
+POST   /api/roles/:id/permissions - Assign permission to role
+POST   /api/users/:id/roles  - Assign role to user
+GET    /api/users/:id/roles  - List user roles
+```
+
+**Usage:**
+- Protect endpoints using middleware, e.g., `RequiredAnyRole("admin")`
+- Check user permissions for sensitive actions
+- All new users get the `user` role by default
+
+**Configuration:**
+- Default role name can be configured; system will create it if missing
 
 ---
 
@@ -279,6 +379,83 @@ NotificationService/
 │   ├── utils/         # Utility functions
 │   └── validators/    # Request validation
 └── package.json
+```
+
+---
+
+### 5. ReviewService (User Reviews & Ratings)
+
+**Language**: Go  
+**Purpose**: Manages user reviews and ratings for hotels and bookings. Enables users to submit, view, and manage their feedback on stays.
+
+#### Features Implemented:
+- ✅ Create Review (with validation)
+- ✅ Get All Reviews
+- ✅ Get Review by ID
+- ✅ (Planned) Delete/Soft Delete Review
+- ✅ Data integrity: links reviews to users, hotels, and bookings
+- ✅ Consistent JSON API responses
+
+#### Technologies & Tools:
+- **Framework**: Go with Chi Router (`github.com/go-chi/chi/v5`)
+- **Database**: MySQL
+- **Validation**: go-playground/validator
+- **Environment**: godotenv
+
+#### API Endpoints:
+```
+POST   /api/v1/reviews/         - Create a new review
+GET    /api/v1/reviews/         - Get all reviews
+GET    /api/v1/reviews/{id}     - Get review by ID
+```
+
+**Request Example:**
+```json
+{
+  "user_id": 1,
+  "hotel_id": 2,
+  "booking_id": 3,
+  "comment": "Great stay!",
+  "rating": 5
+}
+```
+
+**Response Example:**
+```json
+{
+  "status": "success",
+  "message": "Review created successfully",
+  "data": {
+    "id": 1,
+    "user_id": 1,
+    "hotel_id": 2,
+    "booking_id": 3,
+    "comment": "Great stay!",
+    "rating": 5,
+    "created_at": "2025-08-03T04:59:46Z",
+    "updated_at": "2025-08-03T04:59:46Z",
+    "is_synced": false
+  }
+}
+```
+
+#### Data Model:
+- **Review**: id, user_id, hotel_id, booking_id, comment, rating, created_at, updated_at, is_synced
+
+#### Project Structure:
+```
+ReviewService/
+├── app/           # Application config
+├── config/        # DB and env config
+├── controllers/   # Request handlers
+├── db/            # DB connection and repositories
+├── dto/           # Data transfer objects
+├── middlewares/   # Request validation
+├── models/        # Data models
+├── router/        # Route definitions
+├── services/      # Business logic
+├── utils/         # Utility functions
+├── main.go        # Entry point
 ```
 
 ---
