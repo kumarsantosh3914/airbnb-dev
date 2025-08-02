@@ -19,6 +19,6 @@ type Otp struct {
 	Purpose   string
 	ExpiresAt time.Time
 	IsUsed    bool
-	CreatedAt string
-	UpdatedAt string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }

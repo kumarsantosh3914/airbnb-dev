@@ -1,6 +1,7 @@
 package app
 
 import (
+	"AuthInGo/clients"
 	dbConfig "AuthInGo/config/db"
 	config "AuthInGo/config/env"
 	"AuthInGo/controllers"
@@ -47,20 +48,28 @@ func (app *Application) Run() error {
 		return err
 	}
 
+	// Initialize notification client
+	notificationServiceURL := config.GetString("NOTIFICATION_SERVICE_URL", "http://localhost:3002")
+	notificationClient := clients.NewNotificationClient(notificationServiceURL)
+
 	ur := repo.NewUserRepository(db)
 	rr := repo.NewRoleRepository(db)
 	rpr := repo.NewRolePermissionRepository(db)
 	urr := repo.NewUserRoleRepository(db)
+	or := repo.NewOTPRepository(db)
 	rs := services.NewRoleService(rr, rpr, urr)
 	us := services.NewUserService(ur, rs)
+	os := services.NewOTPService(or, notificationClient)
 	uc := controllers.NewUserController(us)
 	rc := controllers.NewRoleController(rs)
+	oc := controllers.NewOTPController(os)
 	uRouter := router.NewUserRouter(uc)
 	rRouter := router.NewRoleRouter(rc)
+	oRouter := router.NewOTPRouter(oc)
 
 	server := &http.Server{
 		Addr:         app.Config.Addr,
-		Handler:      router.SetupRouter(uRouter, rRouter),
+		Handler:      router.SetupRouter(uRouter, rRouter, oRouter),
 		ReadTimeout:  10 * time.Second, // Set read timeout to 10 seconds
 		WriteTimeout: 10 * time.Second, // Set write timeout to 10 seconds
 		IdleTimeout:  10 * time.Second, // Set idle timeout to 10 seconds

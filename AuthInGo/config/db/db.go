@@ -19,6 +19,8 @@ func SetupDB() (*sql.DB, error) {
 
 	fmt.Println("Connecting to database:", cfg.DBName)
 
+	cfg.ParseTime = true
+
 	db, err := sql.Open("mysql", cfg.FormatDSN())
 
 	if err != nil {

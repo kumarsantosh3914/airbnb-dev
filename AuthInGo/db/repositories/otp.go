@@ -55,27 +55,31 @@ func (o *OTPRepositoryImpl) Create(otp *models.Otp) (*models.Otp, error) {
 
 func (r *OTPRepositoryImpl) GetValidOTP(email, code, purpose string) (*models.Otp, error) {
 	query := `
-        SELECT id, email, code, purpose, expires_at, is_used, created_at, updated_at
-        FROM otps 
-        WHERE email = ? AND code = ? AND purpose = ? AND is_used = false AND expires_at > NOW()
-        ORDER BY created_at DESC
-        LIMIT 1
-    `
+    SELECT id, email, code, purpose, expires_at, is_used, created_at, updated_at
+    FROM otps 
+    WHERE email = ? AND code = ? AND purpose = ? AND is_used = false AND expires_at > ?
+    ORDER BY created_at DESC
+    LIMIT 1
+`
 
 	var otp models.Otp
-	err := r.db.QueryRow(query, email, code, purpose).Scan(
+	err := r.db.QueryRow(query, email, code, purpose, time.Now().UTC()).Scan(
 		&otp.Id,
 		&otp.Email,
 		&otp.Code,
 		&otp.Purpose,
 		&otp.ExpiresAt,
 		&otp.IsUsed,
+		&otp.CreatedAt,
+		&otp.UpdatedAt,
 	)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
+
 			return nil, nil // No valid OTP found
 		}
+
 		return nil, fmt.Errorf("failed to get OTP: %v", err)
 	}
 

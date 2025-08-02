@@ -10,17 +10,17 @@ import (
 func GenerateOTP() (string, error) {
 	const digits = "0123456789"
 	const otpLength = 6
-	
+
 	bytes := make([]byte, otpLength)
 	_, err := rand.Read(bytes)
 	if err != nil {
 		return "", err
 	}
-	
+
 	for i := 0; i < otpLength; i++ {
 		bytes[i] = digits[bytes[i]%byte(len(digits))]
 	}
-	
+
 	return string(bytes), nil
 }
 
