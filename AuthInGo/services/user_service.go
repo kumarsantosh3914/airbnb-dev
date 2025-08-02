@@ -19,11 +19,13 @@ type UserService interface {
 
 type UserServiceImpl struct {
 	userRepository db.UserRepository
+	roleService    RoleService
 }
 
-func NewUserService(_userRepository db.UserRepository) UserService {
+func NewUserService(_userRepository db.UserRepository, _roleService RoleService) UserService {
 	return &UserServiceImpl{
 		userRepository: _userRepository,
+		roleService:    _roleService,
 	}
 }
 
@@ -50,6 +52,13 @@ func (u *UserServiceImpl) CreateUser(payload *dto.CreateUserRequestDTO) (*models
 	if err != nil {
 		fmt.Println("Error creating user:", err)
 		return nil, err
+	}
+
+	// Assign default "user" role to new user
+	var roleId int64 = 2
+	err = u.roleService.AssignRoleToUser(user.Id, roleId)
+	if err != nil {
+		fmt.Printf("Warning: Failed to assign default role to user %d: %v\n", user.Id, err)
 	}
 
 	return user, nil
