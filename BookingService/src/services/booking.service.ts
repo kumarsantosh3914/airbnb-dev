@@ -4,6 +4,7 @@ import {
   createBooking,
   createIdempotencyKey,
   finalizedIdempotencyKey,
+  getBookingById,
   getIdempotencyKeyWithLock,
 } from "../repositories/booking.repository";
 import {
@@ -65,3 +66,15 @@ export async function confirmBookingService(idempotencyKey: string) {
     return booking;
   });
 }
+
+export async function getBookingsById(bookingId: number) {
+  const booking = await getBookingById(bookingId);
+
+  if (!booking) {
+    throw new NotFoundError("Booking not found");
+  }
+
+  return booking;
+}
+
+

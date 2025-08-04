@@ -1,9 +1,12 @@
 package services
 
 import (
+	"ReviewService/clients"
+	env "ReviewService/config/env"
 	db "ReviewService/db/repositories"
 	"ReviewService/dto"
 	"ReviewService/models"
+	"fmt"
 )
 
 type ReviewService interface {
@@ -15,15 +18,28 @@ type ReviewService interface {
 
 type ReviewServiceImpl struct {
 	reviewRepository db.ReviewRepository
+	bookingClient    *clients.BookingClient
 }
 
 func NewReviewService(_reviewRepository db.ReviewRepository) ReviewService {
+	bookingClient := clients.NewBookingClient(env.GetString("BOOKING_SERVICE_URL", "http://localhost:3000"), nil)
 	return &ReviewServiceImpl{
 		reviewRepository: _reviewRepository,
+		bookingClient:    bookingClient,
 	}
 }
 
 func (r *ReviewServiceImpl) CreateReview(payload *dto.ReviewDTO) (*models.Review, error) {
+	// validate booking with BookingService
+	isValid, err := r.bookingClient.ValidateBooking(payload.BookingId, payload.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	if !isValid {
+		return nil, fmt.Errorf("invalid booking for user %d", payload.UserId)
+	}
+
 	review, err := r.reviewRepository.CreateReview(
 		payload.UserId,
 		payload.HotelId,
