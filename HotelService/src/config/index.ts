@@ -13,6 +13,11 @@ type DBConfig = {
     DB_NAME: string;
 }
 
+type RedisConfig = {
+    REDIS_PORT?: number;
+    REDIS_HOST?: string;
+}
+
 function loadEnv() {
     dotenv.config();
     console.log('Environment variables loaded from .env file');
@@ -30,4 +35,9 @@ export const dbConfig: DBConfig = {
     DB_USER: String(process.env.DB_USER),
     DB_PASSWORD: String(process.env.DB_PASSWORD),
     DB_NAME: String(process.env.DB_NAME),
+}
+
+export const redisConfig: RedisConfig = {
+    REDIS_PORT: process.env.REDIS_PORT ? Number(process.env.REDIS_PORT) : undefined,
+    REDIS_HOST: process.env.REDIS_HOST || 'localhost',
 }

@@ -75,8 +75,8 @@ export async function processDateBatch(roomCategory: RoomCategory, startDate: Da
             roomsToCreate.push({
                 hotelId: roomCategory.hotelId,
                 roomCategoryId: roomCategory.id,
-                roomNo: 1, // For now default room number, but letter may want to make this dynamic
-                dateOfAvailability: currentDate,
+                roomNo: 3, // For now default room number, but letter may want to make this dynamic
+                dateOfAvailability: new Date(currentDate),
                 price: priceOverride || roomCategory.price,
                 createdAt: new Date(),
                 updatedAt: new Date(),
@@ -89,6 +89,7 @@ export async function processDateBatch(roomCategory: RoomCategory, startDate: Da
     }
 
     if(roomsToCreate.length > 0) {
+        logger.info(`Creating ${roomsToCreate.length} rooms for category ${roomCategory.id} from ${startDate.toISOString()} to ${endDate.toISOString()}`);
         await roomRepository.bulkCreate(roomsToCreate);
         roomsCreated += roomsToCreate.length;
     }
