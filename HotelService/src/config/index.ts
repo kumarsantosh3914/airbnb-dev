@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 type ServerConfig = {
     PORT: number;
     MONGODB_URI: string;
+    ROOM_CRON: string, // Every minute
 }
 
 type DBConfig = {
@@ -28,6 +29,7 @@ loadEnv();
 export const serverConfig: ServerConfig = {
     PORT: Number(process.env.PORT) || 3000,
     MONGODB_URI: String(process.env.MONGODB_URI),
+    ROOM_CRON: process.env.ROOM_CRON || '* * * * *',
 }
 
 export const dbConfig: DBConfig = {
