@@ -17,7 +17,7 @@ export const validateRequestBody = (schema: AnyZodObject): RequestHandler => {
         } catch (error) {
             // If the validation faails, send a 400 response with the error message
             logger.error('Request body is invalid');
-            return res.status(400).json({
+            res.status(400).json({
                 message: "Invalid request body",
                 success: false,
                 error: error
@@ -31,14 +31,14 @@ export const validateRequestBody = (schema: AnyZodObject): RequestHandler => {
  * @param Schema - zod schema to validate the request query params
  * @returns - Middleware function to validate the request query params
  */
-export const validteQueryParams = (Schema: AnyZodObject) => {
+export const validateQueryParams = (schema: AnyZodObject) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
-            await Schema.parseAsync(req.query);
+            await schema.parseAsync(req.query);
             next();
         } catch (error) {
             // If the validation fails, send a 400 response with the error message
-            return res.status(400).json({
+            res.status(400).json({
                 message: "Invalid query params",
                 success: false,
                 error: error

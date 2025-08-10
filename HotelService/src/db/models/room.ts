@@ -12,7 +12,6 @@ class Room extends Model<InferAttributes<Room>, InferCreationAttributes<Room>> {
   declare id: CreationOptional<number>;
   declare hotelId: number;
   declare roomCategoryId: number;
-  declare roomNo: number;
   declare dateOfAvailability: Date;
   declare price: number;
   declare createdAt: CreationOptional<Date>;
@@ -43,10 +42,6 @@ Room.init(
         model: RoomCategory,
         key: 'id',
       },
-    },
-    roomNo: {
-      type: 'INTEGER',
-      allowNull: false,
     },
     dateOfAvailability: {
       type: 'DATE',

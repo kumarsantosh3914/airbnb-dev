@@ -75,7 +75,6 @@ export async function processDateBatch(roomCategory: RoomCategory, startDate: Da
             roomsToCreate.push({
                 hotelId: roomCategory.hotelId,
                 roomCategoryId: roomCategory.id,
-                roomNo: 3, // For now default room number, but letter may want to make this dynamic
                 dateOfAvailability: new Date(currentDate),
                 price: priceOverride || roomCategory.price,
                 createdAt: new Date(),

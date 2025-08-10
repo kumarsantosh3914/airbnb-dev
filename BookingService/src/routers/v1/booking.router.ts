@@ -9,4 +9,8 @@ bookingRouter.post('/', validateRequestBody(createBookingSchema), createBookingH
 bookingRouter.post('/confirm/:idempotencyKey', confirmBookingHandler);
 bookingRouter.get('/:id', getBookingsByHandler);
 
+bookingRouter.get('/helth', (req, res) => {
+    res.status(200).json('OK');
+});
+
 export default bookingRouter;
