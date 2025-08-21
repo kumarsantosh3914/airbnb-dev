@@ -177,89 +177,6 @@ describe("Hotel Controller", () => {
     });
   });
 
-  // describe('PUT /api/v1/hotels/:id', () => {
-  //   it('should return 200 with updated hotel data', async () => {
-  //     const updatedData = { name: 'Updated Hotel', location: 'NYC' };
-  //     const mockUpdatedHotel = { id: 1, ...updatedData };
-  //     (hotelService.updateHotelService as jest.Mock).mockResolvedValue(mockUpdatedHotel);
-
-  //     const res = await request(app)
-  //       .put('/api/v1/hotels/1')
-  //       .send(updatedData);
-
-  //     expect(res.status).toBe(200);
-  //     expect(res.body).toEqual({
-  //       message: 'Hotel updated successfully',
-  //       data: mockUpdatedHotel,
-  //       success: true,
-  //     });
-  //     expect(hotelService.updateHotelService).toHaveBeenCalledWith(1, updatedData);
-  //   });
-
-  //   it('should handle partial updates', async () => {
-  //     const updatedData = { name: 'Partially Updated Hotel' };
-  //     const mockUpdatedHotel = { id: 1, name: 'Partially Updated Hotel', location: 'Original Location' };
-  //     (hotelService.updateHotelService as jest.Mock).mockResolvedValue(mockUpdatedHotel);
-
-  //     const res = await request(app)
-  //       .put('/api/v1/hotels/1')
-  //       .send(updatedData);
-
-  //     expect(res.status).toBe(200);
-  //     expect(res.body.data).toEqual(mockUpdatedHotel);
-  //     expect(hotelService.updateHotelService).toHaveBeenCalledWith(1, updatedData);
-  //   });
-
-  //   it('should handle update of non-existent hotel', async () => {
-  //     (hotelService.updateHotelService as jest.Mock).mockRejectedValue(
-  //       new Error('Hotel not found')
-  //     );
-
-  //     const res = await request(app)
-  //       .put('/api/v1/hotels/999')
-  //       .send({ name: 'Non-existent Hotel' });
-
-  //     expect(res.status).toBeGreaterThanOrEqual(400);
-  //     expect(hotelService.updateHotelService).toHaveBeenCalledWith(99, { name: 'Non-existent Hotel' });
-  //   });
-
-  //   it('should convert string ID to number', async () => {
-  //     const updatedData = { name: 'Test update' };
-  //     const mockUpdatedHotel = { id: 789, ...updatedData };
-  //     (hotelService.updateHotelService as jest.Mock).mockResolvedValue(mockUpdatedHotel);
-
-  //     await request(app)
-  //       .put('/api/v1/hotels/789')
-  //       .send(updatedData);
-
-  //     expect(hotelService.updateHotelService).toHaveBeenCalledWith(789, updatedData);
-  //   });
-
-  //   it('should handle empty update body', async () => {
-  //     const mockUpdatedHotel = { id: 1, name: 'Original Hotel' };
-  //     (hotelService.updateHotelService as jest.Mock).mockResolvedValue(mockUpdatedHotel);
-
-  //     const res = await request(app)
-  //       .put('/api/v1/hotels/1')
-  //       .send({});
-
-  //     expect(res.status).toBe(200);
-  //     expect(hotelService.updateHotelService).toHaveBeenCalledWith(1, {});
-  //   });
-
-  //   it('should handle service vlidation erros', async () => {
-  //     (hotelService.updateHotelService as jest.Mock).mockResolvedValue(
-  //       new Error('Invalid update data')
-  //     );
-
-  //     const res = await request(app)
-  //       .put('/api/v1/hotels/1')
-  //       .send({ name: '' }); // Invalid data
-
-  //     expect(res.status).toBeGreaterThanOrEqual(400);
-  //   });
-  // })
-
   describe('PUT /api/v1/hotels/:id', () => {
     it('should return 200 with updated hotel data', async () => {
       const updatedData = {
@@ -331,7 +248,7 @@ describe("Hotel Controller", () => {
     it('should handle validation errors for invalid data', async () => {
       // Clear previous mock calls for this specific test
       jest.clearAllMocks();
-      
+
       const res = await request(app)
         .put('/api/v1/hotels/1')
         .send({ name: '' }); // Invalid data - missing required fields
