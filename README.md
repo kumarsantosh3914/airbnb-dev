@@ -2,6 +2,9 @@
 
 A comprehensive Airbnb Dev built using microservices architecture with modern technologies. This project demonstrates scalable, distributed system design with separate services for authentication, booking management, hotel management, and notifications.
 
+## Architecture Diagram
+![HLD Design](./image.png)
+
 ## 🏗️ Architecture Overview
 
 This project follows a microservices architecture pattern with the following services:
